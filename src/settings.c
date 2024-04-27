@@ -286,11 +286,20 @@ static void process_conf_file(const gpointer conf_fname, gpointer n_success) {
         ++(*(int *) n_success);
 }
 
-void load_settings(const char *const path) {
+static void load_settings_internal(const char *const init_path) {
+        static const char *path = NULL;
+
         // NOTE: settings_init should be called before if some settings are changed
         //       But having it here is useful for tests
         //       Potentially, we could update the settings code and move this somewhere else
         settings_init();
+
+        // NOTE: The first time we are called during startup, and need to keep
+        //       the original path around for reloading.
+        if (init_path) {
+                path = strdup(init_path);
+        }
+
         LOG_D("Setting defaults");
         set_defaults();
 
@@ -308,5 +317,14 @@ void load_settings(const char *const path) {
                 print_rule(r);
         }
         g_ptr_array_unref(conf_files);
+}
+
+void load_settings(const char *const path) {
+        load_settings_internal(path);
+}
+
+void reload_settings(void) {
+        LOG_I("Reloading configuration");
+        load_settings_internal(NULL);
 }
 /* vim: set ft=c tabstop=8 shiftwidth=8 expandtab textwidth=0: */

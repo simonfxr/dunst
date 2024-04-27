@@ -185,5 +185,7 @@ void settings_init(void);
 
 void load_settings(const char *const path);
 
+void reload_settings(void);
+
 #endif
 /* vim: set ft=c tabstop=8 shiftwidth=8 expandtab textwidth=0: */
