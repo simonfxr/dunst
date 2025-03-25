@@ -197,6 +197,15 @@ gboolean unpause_signal(gpointer data)
         return G_SOURCE_CONTINUE;
 }
 
+gboolean reload_signal(gpointer data)
+{
+        (void)data;
+        reload_settings();
+        wake_up();
+
+        return G_SOURCE_CONTINUE;
+}
+
 gboolean quit_signal(gpointer data)
 {
         (void)data;
@@ -296,6 +305,7 @@ int dunst_main(int argc, char *argv[])
 
         guint pause_src = g_unix_signal_add(SIGUSR1, pause_signal, NULL);
         guint unpause_src = g_unix_signal_add(SIGUSR2, unpause_signal, NULL);
+        guint reload_src = g_unix_signal_add(SIGHUP, reload_signal, NULL);
 
         /* register SIGINT/SIGTERM handler for
          * graceful termination */
@@ -325,6 +335,7 @@ int dunst_main(int argc, char *argv[])
         /* remove signal handler watches */
         g_source_remove(pause_src);
         g_source_remove(unpause_src);
+        g_source_remove(reload_src);
         g_source_remove(term_src);
         g_source_remove(int_src);
 

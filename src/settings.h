@@ -184,6 +184,8 @@ extern bool print_notifications;
 
 void load_settings(char **const config_paths);
 
+void reload_settings(void);
+
 void settings_free(struct settings *s);
 
 #endif

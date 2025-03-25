@@ -262,8 +262,16 @@ static void process_conf_file(const gpointer conf_fname, gpointer n_success) {
         ++(*(int *) n_success);
 }
 
-void load_settings(char **const paths)
+static void load_settings_internal(char **const init_paths)
 {
+        static char **paths = NULL;
+
+        // NOTE: The first time we are called during startup, and need to keep
+        // the original paths around for reloading.
+        if (init_paths) {
+                paths = g_strdupv(init_paths);
+        }
+
         LOG_D("Setting defaults");
         set_defaults();
 
@@ -288,6 +296,17 @@ void load_settings(char **const paths)
                 LOG_M("No configuration file found, using defaults");
 
         g_ptr_array_unref(conf_files);
+}
+
+void load_settings(char **const paths)
+{
+        load_settings_internal(paths);
+}
+
+void reload_settings(void)
+{
+        LOG_I("Reloading configuration");
+        load_settings_internal(NULL);
 }
 
 void settings_free(struct settings *s)
